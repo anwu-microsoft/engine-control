@@ -2,8 +2,11 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os, csv, sys, time, argparse
-#import sim.cartpole as cartpole #importing simulator
-import sim.house_simulator as house_simulator
+
+# Create Parameters that will be replated by actions from brain
+import scipy.io as sio
+import random
+import scipy.signal as spsig
 
 class Model():
 	"""
@@ -35,8 +38,12 @@ class Model():
 
 	"""
 
-	def __init__(self, K: float = 0.5, C: float = 0.3, 
-				occupancy: int = 1, Qhvac: int = 9, predict: bool = False):
+	def __init__(self,
+				K: float = 0.5,
+				C: float = 0.3,
+				occupancy: int = 1,
+				Qhvac: int = 9,
+				predict: bool = False):
 
 		self.modeldir = 'sim'
 		os.chdir('./' +  self.modeldir)
@@ -72,15 +79,11 @@ class Model():
 		
 		"""
 		if self.predict:
-			self.number_of_days = 14
-			self.number_of_hours = number_of_hours
-			self.timestep = timestep
-			self.max_iterations = int((self.number_of_days*self.number_of_hours)*60 / self.timestep)
+
+			self.max_iterations = 1000
 		else:
-			self.number_of_days = number_of_days
-			self.number_of_hours = number_of_hours
-			self.timestep = timestep
-			self.max_iterations = int((self.number_of_days*self.number_of_hours)*60 / self.timestep)
+
+			self.max_iterations = 1000
 
 		self.simulator_reset()
 
@@ -96,7 +99,7 @@ class Model():
 		self.iteration = 0
 		self.simulator_configure(config)
 	
-	def simulator_configure(self, config, initial_hvac: int = 0):
+	def simulator_configure(self, config, initial_ki: int = 0, initial_kp: int = 0):
 		"""Set up simulator initial conditions and configuration at the start of every episode
 		
 		Parameters
@@ -107,7 +110,8 @@ class Model():
 		
 		"""
 		action = {
-			"hvacON": initial_hvac
+			"set_ki": initial_ki,
+			"set_kp": initial_kp,
 		}
 
 		if self.predict:

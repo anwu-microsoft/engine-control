@@ -31,10 +31,21 @@ class Star():
 		"""
 		self.observations = self.model.simulator_get_observations()
 		self.state = {
+
+			#What the brain controls
 			'Ki': float(self.observations['Ki']),
 			'Kp': float(self.observations['Kp']),
 
-            #Can define more state variables here if desired.
+			#What we monitor
+			'peak_time': float(self.observations['peak_time']),
+			'rise_time': float(self.observations['rise_time']),
+			'settling_time': float(self.observations['settling_time']),
+
+			'settling_min': float(self.observations['settling_min']),
+			'settling_max': float(self.observations['settling_max']),
+
+
+			#Can define more state variables here if desired.
 		}
 
 		# TODO: normalize?
