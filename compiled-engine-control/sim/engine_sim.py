@@ -1,56 +1,40 @@
+# Create Parameters that will be replated by actions from brain
 import numpy as np
+import scipy.io as sio
+import os
+import matplotlib.pyplot as plt
+import pandas as pd
+import random
+import scipy.signal as spsig
 
-class House():
-    def __init__(self, K, C, Tout, Tin, Tset, occupancy, Qhvac, hvacON):
-        self.K = K # thermal conductivity
-        self.C = C # thermal capacity
-        self.Tout = Tout # Outside Temperature
-        self.Tin = Tin # Inside Temperature 
-        self.Tset = Tset # Setpoint Temperature
-        self.occupancy = occupancy # 0 (no one in the room) or 1 (somebody in the room)
-        self.Qhvac = Qhvac # Cooling capacity
-        self.Phvac = Qhvac # Electric power capacity 
-        self.hvacON = hvacON # control action = 0 (OFF) or 1 (ON)
-        self.timestep = 5/60.0 # 5 min simulation step converted to h
+class Engine():
+    def __init__(self, Ki, Kp, dJ):
+        self.Ki = Ki  # something engine related...
+        self.Kp = Kp  # something engine related...
+        self.dJ = dJ  # something engine related...
+        self.rpms = None # signal reaction
      
-    def setup_schedule(
-        self, days, hours, timestep, Tset_schedule, Tout_schedule,
-        Tin_initial,
-        ):
 
-        self.number_of_days = days
-        self.number_of_hours = hours
-        self.timestep = timestep
-        self.max_iterations = int((self.number_of_days*self.number_of_hours)*60 / self.timestep)
 
-        self.Tset_schedule = Tset_schedule
-        self.Tout_schedule = Tout_schedule
-        self.Tin_initial = Tin_initial
-
-    def update_Tout(self,Tout_new):
-        self.Tout = Tout_new # Update to new outside temperature
+    def update_Ki(self, Ki_new):
+        self.Ki = Ki_new # Update to new Ki
         
-    def update_Tset(self,Tset_new):
-        self.Tset = Tset_new # Update to new setpoint temperature
+    def update_Kp(self,Kp_new):
+        self.Kp = Kp_new # Update to new Kp
     
-    def update_hvacON(self,hvacONnew):
-        self.hvacON = hvacONnew # update to new hvacON
+    def update_dJ(self,dJ_new):
+        self.dJ = dJ_new # update to new dJ
 
-    def update_occupancy(self,occupancy_new):
-        self.occupancy = occupancy_new # update to new occupancy
-      
-    def update_Tin(self):
+    def run_engine(self):
         """Update inside temperation.
-        Describes the inside temperature evolution as a function of all other variables. 
+        Describes the inside temperature evolution as a function of all other variables.
         """
 
-        self.Tin = self.Tin - self.timestep / self.C*(self.K*(self.Tin-self.Tout)+self.Qhvac*self.hvacON)
+        np.array([self.Kp, self.Ki, self.dJ]).astype('double').tofile('binn.bin')
+        os.system('engineclosed')
+        self.rpms = sio.loadmat('rpms.mat') #Ok we gonna need to redo this for parallelism
 
-    def get_Power(self):
-        COP = 3
-        Power = self.Phvac*self.hvacON*COP 
-        return Power
-        
+
  # print the object nicely   
     def __str__(self):
         string_to_print = []

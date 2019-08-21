@@ -3,10 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os, csv, sys, time, argparse
 
-# Create Parameters that will be replated by actions from brain
-import scipy.io as sio
-import random
-import scipy.signal as spsig
+
 
 class Model():
 	"""
@@ -60,10 +57,7 @@ class Model():
 		self.simulator_initialize()
 
 	def simulator_initialize(
-		self, 
-		number_of_days: int = 1, 
-		number_of_hours: int = 24, 
-		timestep: int = 5,
+		self,
 		):
 		"""
 		Initialize simulator environment and with initial conditions once, at launch.
